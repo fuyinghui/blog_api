@@ -1,45 +1,38 @@
 package main
 
 import (
+	"blog_api/db"
+	"blog_api/router"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/spf13/viper"
 	"log"
-	"net/http"
+	"os"
 )
 
-type User struct {
-	gorm.Model
-	name     string
-	password int64
-	phone    int
-}
-
 func main() {
+	log.Printf("准备进入Initconfig方法")
+	InitConfig()
+	log.Printf("执行完了Initconfig方法")
+	db := db.InitDB()
+	log.Printf("执行完了initDB方法")
+	defer db.Close()
 	r := gin.Default()
-	r.POST("/api/auth/register", func(c *gin.Context) {
-		name := c.PostForm("name")
-		telephone := c.PostForm("telephone")
-		password := c.PostForm("password")
-		if len(telephone) != 11 {
-			c.JSON(http.StatusUnprocessableEntity, gin.H{
-				"code":    422,
-				"message": "手机号必须为11位",
-			})
-		}
-		if len(password) < 6 {
-			c.JSON(http.StatusUnprocessableEntity, gin.H{
-				"code":    422,
-				"message": "密码不能小于6位",
-			})
-		}
-		if len(name) == 0 {
-			c.JSON(http.StatusUnprocessableEntity, gin.H{
-				"code":    422,
-				"message": "用户名不能为空",
-			})
-		}
-		//判断用户是否存在
-		log.Println(name, password, telephone)
-	})
-	r.Run()
+	r = router.CollectRouter(r)
+	port := viper.GetString("server.port")
+	if port != "" {
+		panic(r.Run(":" + port))
+	}
+	panic(r.Run())
+}
+func InitConfig() {
+	log.Printf("进入了Initconfig方法")
+	workDir, _ := os.Getwd()
+	viper.SetConfigName("application")
+	viper.SetConfigType("yml")
+	viper.AddConfigPath(workDir + "/config")
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic("err")
+	}
 }
