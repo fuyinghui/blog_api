@@ -2,9 +2,9 @@ server:
   port: 8080
 datasource:
   driverName: mysql
-  host: 121.40.219.69
+  host: 127.0.0.1
   port: 3306
   database: go_blog
   username: root
-  password: YYk358@q
+  password: 123456
   charset: utf8
