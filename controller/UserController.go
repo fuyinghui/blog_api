@@ -24,8 +24,12 @@ func Login(c *gin.Context) {
 	log.Println("进入了login方法")
 	db := db.GetDB()
 	//获取参数
-	telephone := c.PostForm("telephone")
-	password := c.PostForm("password")
+	var requestUser = model.User{}
+	//log.Println(requestUser)
+	c.Bind(&requestUser)
+	log.Println(requestUser.Telephone)
+	telephone := requestUser.Telephone
+	password := requestUser.Password
 	//参数验证
 	if len(telephone) != 11 {
 		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "手机号必须为11位")
@@ -46,8 +50,8 @@ func Login(c *gin.Context) {
 	//判断手机号是否存在
 	var user model.User
 	db.Where("telephone = ?", telephone).First(&user)
-	if user.ID == 0 {
-		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "用户已存在")
+	if !isTelephoneExist(db, telephone) {
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "用户不存在")
 		/*c.JSON(http.StatusUnprocessableEntity, gin.H{
 		"code": 422,
 		"msg":  "用户已存在"})*/
