@@ -10,6 +10,8 @@ func CollectRouter(r *gin.Engine) *gin.Engine {
 	r.Use(middleware.CORSMiddleware())
 	r.POST("/api/auth/register", controller.Register)
 	r.POST("/api/auth/login", controller.Login)
+	r.GET("/api/auth/articlePubList", controller.ArticleListInfo)
+	r.GET("/api/auth/articlePubInfo", controller.ArticleInfo)
 	r.PUT("/api/auth/articleUpdate", middleware.AuthMiddleware(), controller.ArticleUpdate)
 	r.DELETE("/api/auth/articleDel", middleware.AuthMiddleware(), controller.ArticleDel)
 	r.GET("/api/auth/articleInfo", middleware.AuthMiddleware(), controller.ArticleInfo)

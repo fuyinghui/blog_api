@@ -47,6 +47,14 @@ func ArticleListInfo(c *gin.Context) {
 	//log.Println(dto.ToArticleArrayDto(articles))
 	response.Response(c, http.StatusOK, 200, gin.H{"articles": dto.ToArticleArrayDto(articles)}, "success!")
 }
+func ArticlePubListInfo(c *gin.Context) {
+	log.Println("进入了ArticleListInfo")
+	db := db.GetDB()
+	var articles []model.Article
+	db.Where("status = ?", 1).Order("created_at desc").Find(&articles)
+	//log.Println(dto.ToArticleArrayDto(articles))
+	response.Response(c, http.StatusOK, 200, gin.H{"articles": dto.ToArticleArrayDto(articles)}, "success!")
+}
 func isArticleExist(db *gorm.DB, title string) bool {
 	var article model.Article
 	db.Where("title = ?", title).First(&article)
